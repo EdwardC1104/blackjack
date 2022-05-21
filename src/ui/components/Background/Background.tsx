@@ -55,7 +55,7 @@ export default function Background({ children, noPadding }: Props) {
             flex: 1,
             alignItems: "center",
             justifyContent: "flex-start",
-            marginHorizontal: noPadding ? 0 : 40,
+            marginHorizontal: noPadding ? 0 : 32,
           }}
         >
           {children}

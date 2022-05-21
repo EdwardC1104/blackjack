@@ -13,10 +13,12 @@ import * as SystemUI from "expo-system-ui";
 import dayjs from "dayjs";
 import { Provider } from "react-redux";
 import { store } from "./src/state/store";
+import { createUsersTable } from "./src/database";
+import { enableLayoutAnimations } from "react-native-reanimated";
 
 dayjs.Ls.en.weekStart = 1;
 SystemUI.setBackgroundColorAsync("#000000");
-// enableLayoutAnimations(true);
+enableLayoutAnimations(true);
 
 export default function App() {
   const [appIsReady, setAppIsReady] = useState(false);
@@ -25,6 +27,7 @@ export default function App() {
     async function prepare() {
       await SplashScreen.preventAutoHideAsync();
       await Font.loadAsync("Montserrat_SemiBold", Montserrat_SemiBold);
+      await createUsersTable();
       setAppIsReady(true);
     }
 
