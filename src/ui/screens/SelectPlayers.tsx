@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import { Alert, FlatList, Pressable, Text, View } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 import Animated, { Layout } from "react-native-reanimated";
@@ -21,6 +21,14 @@ interface Props {
 }
 
 export default function SelectPlayers({ navigation }: Props) {
+  const initialRender = useRef(true);
+
+  useEffect(() => {
+    initialRender.current = false;
+  }, []);
+
+  // console.log(initialRender.current ? undefined : Layout.springify());
+
   const numberOfPlayers = useSelector(
     (state: RootState) => state.game.numberOfPlayers
   );

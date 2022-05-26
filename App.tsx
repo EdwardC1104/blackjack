@@ -1,12 +1,7 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { StatusBar } from "expo-status-bar";
 import { View } from "react-native";
-import { Montserrat_SemiBold } from "./src/ui/fonts";
-import Background from "./src/ui/components/Background";
-import WelcomeTitle from "./src/ui/components/WelcomeTitle";
 import * as SplashScreen from "expo-splash-screen";
-import * as Font from "expo-font";
-import Button from "./src/ui/components/Button";
 import MainStackNavigator from "./src/ui/navigation/MainStackNavigator";
 import { DefaultTheme, NavigationContainer } from "@react-navigation/native";
 import * as SystemUI from "expo-system-ui";
@@ -26,7 +21,6 @@ export default function App() {
   useEffect(() => {
     async function prepare() {
       await SplashScreen.preventAutoHideAsync();
-      await Font.loadAsync("Montserrat_SemiBold", Montserrat_SemiBold);
       await createUsersTable();
       setAppIsReady(true);
     }

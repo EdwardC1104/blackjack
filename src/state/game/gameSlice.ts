@@ -1,13 +1,16 @@
 import { createSlice } from "@reduxjs/toolkit";
+import Deck from "../../classes/Deck";
 
 interface GameState {
   numberOfPlayers: 1 | 2 | 3 | 4 | 5;
   selectedPlayers: string[];
+  deck: Deck;
 }
 
 const initialState: GameState = {
   numberOfPlayers: 1,
   selectedPlayers: [],
+  deck: new Deck(),
 };
 
 const gameSlice = createSlice({
@@ -28,6 +31,9 @@ const gameSlice = createSlice({
         (player) => player !== action.payload
       );
     },
+    shuffleDeck: (state) => {
+      state.deck = state.deck.shuffle();
+    },
   },
 });
 
@@ -37,4 +43,5 @@ export const {
   decrementNumberOfPlayers,
   addSelectedPlayer,
   removeSelectedPlayer,
+  shuffleDeck,
 } = gameSlice.actions;

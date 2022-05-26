@@ -5,6 +5,7 @@ import NumberOfPlayers from "../screens/NumberOfPlayers";
 import { View } from "react-native";
 import SelectPlayers from "../screens/SelectPlayers";
 import NewPlayer from "../screens/NewPlayer";
+import Game from "../screens/Game";
 
 const MainStack = createStackNavigator();
 
@@ -24,6 +25,15 @@ export default function MainStackNavigator() {
         <MainStack.Screen name="SelectPlayers" component={SelectPlayers} />
         <MainStack.Group screenOptions={{ presentation: "modal" }}>
           <MainStack.Screen name="NewPlayer" component={NewPlayer} />
+        </MainStack.Group>
+        <MainStack.Group
+          screenOptions={
+            {
+              /*gestureEnabled: false*/
+            }
+          }
+        >
+          <MainStack.Screen name="Game" component={Game} />
         </MainStack.Group>
       </MainStack.Navigator>
     </View>
