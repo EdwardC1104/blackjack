@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from "react";
-import { Alert, FlatList, Pressable, Text, View } from "react-native";
+import { Alert, Pressable, Text, View } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 import Animated, { Layout } from "react-native-reanimated";
 import { useDispatch } from "react-redux";
@@ -7,6 +7,7 @@ import { useSelector } from "react-redux";
 import { deleteUser, getUsers } from "../../database";
 import {
   addSelectedPlayer,
+  initialiseGame,
   removeSelectedPlayer,
 } from "../../state/game/gameSlice";
 import { RootState } from "../../state/store";
@@ -26,8 +27,6 @@ export default function SelectPlayers({ navigation }: Props) {
   useEffect(() => {
     initialRender.current = false;
   }, []);
-
-  // console.log(initialRender.current ? undefined : Layout.springify());
 
   const numberOfPlayers = useSelector(
     (state: RootState) => state.game.numberOfPlayers
@@ -80,6 +79,8 @@ export default function SelectPlayers({ navigation }: Props) {
     );
   };
 
+  const selectedPlayersIds = selectedPlayers.map((player) => player.id);
+
   return (
     <Background>
       <ScrollView
@@ -106,8 +107,8 @@ export default function SelectPlayers({ navigation }: Props) {
               key={item.id}
               name={item.name}
               avatar={item.avatar}
-              selected={selectedPlayers.includes(item.id)}
-              onSelect={() => dispatch(addSelectedPlayer(item.id))}
+              selected={selectedPlayersIds.includes(item.id)}
+              onSelect={() => dispatch(addSelectedPlayer(item))}
               onDeselect={() => dispatch(removeSelectedPlayer(item.id))}
               onDelete={() => onDelete(item.id)}
             />
@@ -135,7 +136,10 @@ export default function SelectPlayers({ navigation }: Props) {
         <View style={{ position: "absolute", bottom: 0 }}>
           <Button
             title="Begin!"
-            onPress={() => navigation.navigate("Game")}
+            onPress={() => {
+              dispatch(initialiseGame());
+              navigation.navigate("Game");
+            }}
             raised
             disabled={selectedPlayers.length !== numberOfPlayers}
           />

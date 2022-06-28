@@ -1,4 +1,4 @@
-import React, { ReactNode, ReactText } from "react";
+import React, { ReactNode } from "react";
 import { StyleProp, Text, TextStyle } from "react-native";
 
 interface Props {

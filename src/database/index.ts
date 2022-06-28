@@ -34,5 +34,15 @@ async function getUsers() {
   `)) as User[];
 }
 
+async function getUser(id: string) {
+  return (
+    await db.query(sql`
+    SELECT * FROM users
+    WHERE id = ${id}
+    LIMIT 1;
+  `)
+  )[0] as User;
+}
+
 export default db;
-export { createUsersTable, addUser, getUsers, deleteUser };
+export { createUsersTable, addUser, getUsers, deleteUser, getUser };

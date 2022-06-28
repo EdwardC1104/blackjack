@@ -1,10 +1,7 @@
-import { immerable, produce } from "immer";
 import Card, { Rank, Suit } from "./Card";
 
 export default class Deck {
-  readonly cards: Card[];
-
-  [immerable] = true;
+  cards: Card[];
 
   constructor() {
     this.cards = [];
@@ -34,12 +31,10 @@ export default class Deck {
   }
 
   shuffle() {
-    return produce(this, (draft) => {
-      draft.cards = draft.cards
-        .map((value) => ({ value, sort: Math.random() }))
-        .sort((a, b) => a.sort - b.sort)
-        .map(({ value }) => value);
-    });
+    this.cards = this.cards
+      .map((value) => ({ value, sort: Math.random() }))
+      .sort((a, b) => a.sort - b.sort)
+      .map(({ value }) => value);
   }
 
   dealCard() {
@@ -47,10 +42,6 @@ export default class Deck {
   }
 
   removeCard(cardToRemove: Card) {
-    return produce(this, (draft) => {
-      draft.cards = draft.cards.filter(
-        (card) => !card.isIdentical(cardToRemove)
-      );
-    });
+    this.cards = this.cards.filter((card) => !card.isIdentical(cardToRemove));
   }
 }

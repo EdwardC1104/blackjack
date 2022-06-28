@@ -1,9 +1,15 @@
-import React, { useEffect } from "react";
+import React, { MutableRefObject, useEffect } from "react";
 import { Image, View } from "react-native";
 import { useSelector } from "react-redux";
 import { useDispatch } from "react-redux";
 import { getCardBackAsset, getPlayingCardAsset } from "../../../assets/cards";
-import { shuffleDeck } from "../../state/game/gameSlice";
+import Player from "../../classes/Player";
+import {
+  cycleActivePlayer,
+  hit,
+  initialiseGame,
+  stand,
+} from "../../state/game/gameSlice";
 import Background from "../components/Background";
 import Button from "../components/Button";
 import PlayerHand from "../components/PlayerHand";
@@ -13,23 +19,90 @@ interface Props {
   navigation: any;
 }
 
+const DELAY = 2000;
+
+const getAllPlayersFinished = (players: Player[]) => {
+  return players.every(
+    (player) => player.getIsBust() || player.getIsStanding()
+  );
+};
+
+const delay = (
+  callback: () => any,
+  duration: number,
+  shouldSkipRef: MutableRefObject<boolean>
+) => {
+  if (!shouldSkipRef.current) {
+    shouldSkipRef.current = true;
+    setTimeout(() => {
+      shouldSkipRef.current = false;
+      callback();
+    }, duration);
+  }
+};
+
 export default function Game({ navigation }: Props) {
-  // const dispatch = useDispatch();
-  // const { player } = useSelector((state: any) => state.game);
+  const waitingRef = React.useRef(false);
+
+  const dispatch = useDispatch();
+  const { players } = useSelector((state: any) => state.game);
+  const dealer = players.find((player: Player) => player.id === "dealer");
+  const activePlayer = players[0];
+  // if (activePlayer.id === "dealer") {
+  //   activePlayer = players[1];
+  // }
+
+  const allFinished = getAllPlayersFinished(players);
+
+  const buttonsDisabled =
+    activePlayer.getIsBust() ||
+    activePlayer.getIsStanding() ||
+    activePlayer.id === dealer.id;
 
   // useEffect(() => {
-  //   dispatch(addCardToPlayer());
-  // }, []);
+  //   // DEVELOPMENT ONLY
+  //   if (players.len === 0) dispatch(initialiseGame());
+  // }, [players]);
 
-  // useEffect(() => {
-  //   console.log(player);
-  // }, [player]);
+  useEffect(() => {
+    if (activePlayer.getIsBust() || activePlayer.getIsStanding()) {
+      delay(
+        () => {
+          dispatch(cycleActivePlayer());
+        },
+        0,
+        waitingRef
+      );
+    } else if (activePlayer.id === dealer.id) {
+      dispatch(hit(activePlayer.id));
+      delay(
+        () => {
+          dispatch(cycleActivePlayer());
+        },
+        DELAY,
+        waitingRef
+      );
+    }
+  }, [activePlayer.id, activePlayer.getIsBust(), activePlayer.getIsStanding()]);
+
+  useEffect(() => {
+    if (allFinished) {
+      waitingRef.current = false;
+      delay(
+        () => {
+          navigation.navigate("Welcome");
+        },
+        DELAY,
+        waitingRef
+      );
+    }
+  }, [allFinished]);
 
   return (
     <Background>
-      <ScreenTitle>dealer</ScreenTitle>
-      <View style={{ flexDirection: "row", marginTop: 32, marginBottom: 42 }}>
-        <Image
+      {/* <ScreenTitle>dealer</ScreenTitle> */}
+      {/* <View style={{ flexDirection: "row", marginTop: 32, marginBottom: 42 }}> */}
+      {/* <Image
           source={getCardBackAsset()}
           style={{
             height: 121,
@@ -39,15 +112,30 @@ export default function Game({ navigation }: Props) {
           }}
         />
         <Image
-          source={getPlayingCardAsset("diamonds", "2")}
+          source={getPlayingCardAsset(dealer.hand[1].suit, dealer.hand[1].rank)}
           style={{
             height: 121,
             width: 83,
             resizeMode: "contain",
           }}
+        /> */}
+      <PlayerHand
+        key={dealer.id}
+        name={dealer.name + " - " + dealer.getValue()}
+        cards={dealer.hand}
+        bust={dealer.getIsBust()}
+        standing={dealer.getIsStanding()}
+      />
+      {/* </View> */}
+      <View style={{ opacity: activePlayer.id !== dealer.id ? 1 : 0 }}>
+        <PlayerHand
+          key={activePlayer.id + "-active"}
+          name={activePlayer.name + " - " + activePlayer.getValue()}
+          cards={activePlayer.hand}
+          bust={activePlayer.getIsBust()}
+          standing={activePlayer.getIsStanding()}
         />
       </View>
-      <PlayerHand name="John" />
       <View
         style={{
           flexDirection: "row",
@@ -57,12 +145,51 @@ export default function Game({ navigation }: Props) {
           marginBottom: 64,
         }}
       >
-        <PlayerHand name="Jack" tiny />
-        <PlayerHand name="Jack" tiny />
-        <PlayerHand name="Jack" tiny />
+        {players.map(
+          (player: Player) =>
+            player.id !== dealer.id &&
+            player.id !== activePlayer.id && (
+              <PlayerHand
+                key={player.id}
+                name={player.name + " - " + player.getValue()}
+                tiny
+                cards={player.hand}
+                bust={player.getIsBust()}
+                standing={player.getIsStanding()}
+              />
+            )
+        )}
       </View>
-      <Button title="hit" onPress={() => undefined} gold disabled />
-      <Button title="stand" onPress={() => undefined} gold disabled />
+      <Button
+        title="hit"
+        onPress={() => {
+          dispatch(hit(activePlayer.id));
+          delay(
+            () => {
+              dispatch(cycleActivePlayer());
+            },
+            DELAY,
+            waitingRef
+          );
+        }}
+        gold
+        disabled={buttonsDisabled}
+      />
+      <Button
+        title="stand"
+        onPress={() => {
+          dispatch(stand(activePlayer.id));
+          delay(
+            () => {
+              dispatch(cycleActivePlayer());
+            },
+            DELAY,
+            waitingRef
+          );
+        }}
+        gold
+        disabled={buttonsDisabled}
+      />
     </Background>
   );
 }

@@ -2,7 +2,6 @@ import MaskedView from "@react-native-masked-view/masked-view";
 import { BlurView } from "expo-blur";
 import React from "react";
 import { Image, Text, View } from "react-native";
-import avatarPlaceholder from "./avatar-placeholder.png";
 import penguin from "../../../../assets/avatars/penguin.png";
 import elephant from "../../../../assets/avatars/elephant.png";
 import ferret from "../../../../assets/avatars/ferret.png";

@@ -1,14 +1,15 @@
-import { immerable, produce } from "immer";
-import Hand from "./Hand";
+import Card from "./Card";
 
 export default class Player {
-  readonly hand: Hand;
-  readonly isStanding: boolean;
+  readonly hand: Card[];
+  isStanding: boolean;
+  readonly id: string;
+  readonly name: string;
 
-  [immerable] = true;
-
-  constructor() {
-    this.hand = new Hand();
+  constructor(id: string, name: string) {
+    this.id = id;
+    this.name = name;
+    this.hand = [];
     this.isStanding = false;
   }
 
@@ -17,12 +18,62 @@ export default class Player {
   }
 
   setIsStanding(isStanding: boolean) {
-    return produce(this, (draft) => {
-      draft.isStanding = isStanding;
-    });
+    this.isStanding = isStanding;
   }
 
   getIsBust() {
-    return this.hand.getValue() > 21;
+    return this.getValue() > 21;
+  }
+
+  addCard(card: Card) {
+    this.hand.push(card);
+  }
+
+  getValue() {
+    // This doesn't work if you have multiple aces
+    const valueDictionary = {
+      ace: 1,
+      "2": 2,
+      "3": 3,
+      "4": 4,
+      "5": 5,
+      "6": 6,
+      "7": 7,
+      "8": 8,
+      "9": 9,
+      "10": 10,
+      jack: 10,
+      queen: 10,
+      king: 10,
+    };
+
+    const altValueDictionary = {
+      ace: 11,
+      "2": 2,
+      "3": 3,
+      "4": 4,
+      "5": 5,
+      "6": 6,
+      "7": 7,
+      "8": 8,
+      "9": 9,
+      "10": 10,
+      jack: 10,
+      queen: 10,
+      king: 10,
+    };
+
+    let totalValue = 0;
+    let altTotalValue = 0;
+
+    for (const card of this.hand) {
+      totalValue += valueDictionary[card.rank];
+      altTotalValue += altValueDictionary[card.rank];
+    }
+
+    if (altTotalValue <= 21 && altTotalValue >= totalValue)
+      return altTotalValue;
+
+    return totalValue;
   }
 }

@@ -1,10 +1,7 @@
-import { immerable, produce } from "immer";
 import Card from "./Card";
 
 export default class Hand {
   readonly cards: Card[];
-
-  [immerable] = true;
 
   constructor() {
     this.cards = [];
@@ -37,8 +34,6 @@ export default class Hand {
   }
 
   addCard(card: Card) {
-    return produce(this, (draft) => {
-      draft.cards.push(card);
-    });
+    this.cards.push(card);
   }
 }

@@ -1,5 +1,3 @@
-import { immerable } from "immer";
-
 export type Suit = "clubs" | "diamonds" | "hearts" | "spades";
 export type Rank =
   | "ace"
@@ -19,8 +17,6 @@ export type Rank =
 export default class Card {
   readonly rank: Rank;
   readonly suit: Suit;
-
-  [immerable] = true;
 
   constructor(rank: Rank, suit: Suit) {
     this.rank = rank;
