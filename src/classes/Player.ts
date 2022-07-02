@@ -5,10 +5,12 @@ export default class Player {
   isStanding: boolean;
   readonly id: string;
   readonly name: string;
+  readonly avatar: string;
 
-  constructor(id: string, name: string) {
+  constructor(id: string, name: string, avatar: string) {
     this.id = id;
     this.name = name;
+    this.avatar = avatar;
     this.hand = [];
     this.isStanding = false;
   }

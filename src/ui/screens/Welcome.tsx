@@ -26,7 +26,11 @@ export default function Welcome({ navigation }: Props) {
             gold
             large
           />
-          <Button onPress={() => undefined} title="Leaderboard" large />
+          <Button
+            onPress={() => navigation.navigate("Leaderboard")}
+            title="Leaderboard"
+            large
+          />
         </View>
       </View>
     </Background>

@@ -8,7 +8,7 @@ import * as SystemUI from "expo-system-ui";
 import dayjs from "dayjs";
 import { Provider } from "react-redux";
 import { store } from "./src/state/store";
-import { createUsersTable } from "./src/database";
+import { createUsersTable, createWinnersTable } from "./src/database";
 import { enableLayoutAnimations } from "react-native-reanimated";
 
 dayjs.Ls.en.weekStart = 1;
@@ -22,6 +22,7 @@ export default function App() {
     async function prepare() {
       await SplashScreen.preventAutoHideAsync();
       await createUsersTable();
+      await createWinnersTable();
       setAppIsReady(true);
     }
 

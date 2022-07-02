@@ -2,12 +2,17 @@ import { createSlice } from "@reduxjs/toolkit";
 import Dealer from "../../classes/Dealer";
 import Deck from "../../classes/Deck";
 import Player from "../../classes/Player";
+import { addWinner } from "../../database";
 
 interface GameState {
   numberOfPlayers: 1 | 2 | 3 | 4 | 5;
   selectedPlayers: User[];
   deck: Deck;
   players: Player[];
+  results: {
+    playerId: Player["id"];
+    didWin: boolean;
+  }[];
   // activePlayer: string;
 }
 
@@ -16,6 +21,7 @@ const initialState: GameState = {
   selectedPlayers: [],
   deck: new Deck(),
   players: [],
+  results: [],
   // activePlayer: "",
 };
 
@@ -44,10 +50,12 @@ const gameSlice = createSlice({
       state.deck.shuffle();
       state.players = [
         ...state.selectedPlayers.map((user) => {
-          return new Player(user.id, user.name);
+          return new Player(user.id, user.name, user.avatar);
         }),
-        new Dealer("dealer", "dealer"),
+        new Dealer("dealer", "dealer", "dealer"),
       ];
+
+      state.results = [];
 
       state.players.forEach((player) => {
         let dealtCard = state.deck.dealCard();
@@ -93,6 +101,26 @@ const gameSlice = createSlice({
       ];
       // console.log(state.players.map((player) => player.name));
     },
+    calculateResults: (state) => {
+      const dealer = state.players.find(
+        (player: Player) => player.id === "dealer"
+      ) as Player;
+
+      state.results = state.players
+        .filter((player) => player.id !== "dealer")
+        .map((player) => {
+          const didWin =
+            (player.getValue() > dealer.getValue() && !player.getIsBust()) ||
+            (dealer.getIsBust() && !player.getIsBust());
+
+          addWinner(player.id, didWin);
+
+          return {
+            playerId: player.id,
+            didWin,
+          };
+        });
+    },
   },
 });
 
@@ -106,4 +134,5 @@ export const {
   hit,
   stand,
   cycleActivePlayer,
+  calculateResults,
 } = gameSlice.actions;

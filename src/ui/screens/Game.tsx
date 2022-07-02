@@ -5,11 +5,13 @@ import { useDispatch } from "react-redux";
 import { getCardBackAsset, getPlayingCardAsset } from "../../../assets/cards";
 import Player from "../../classes/Player";
 import {
+  calculateResults,
   cycleActivePlayer,
   hit,
   initialiseGame,
   stand,
 } from "../../state/game/gameSlice";
+import { RootState } from "../../state/store";
 import Background from "../components/Background";
 import Button from "../components/Button";
 import PlayerHand from "../components/PlayerHand";
@@ -45,12 +47,13 @@ export default function Game({ navigation }: Props) {
   const waitingRef = React.useRef(false);
 
   const dispatch = useDispatch();
-  const { players } = useSelector((state: any) => state.game);
-  const dealer = players.find((player: Player) => player.id === "dealer");
+  const players = useSelector((state: RootState) => state.game.players);
+  const dealer = players.find(
+    (player: Player) => player.id === "dealer"
+  ) as Player;
   const activePlayer = players[0];
-  // if (activePlayer.id === "dealer") {
-  //   activePlayer = players[1];
-  // }
+  const gameIsFinished =
+    useSelector((state: RootState) => state.game.results).length !== 0;
 
   const allFinished = getAllPlayersFinished(players);
 
@@ -59,38 +62,41 @@ export default function Game({ navigation }: Props) {
     activePlayer.getIsStanding() ||
     activePlayer.id === dealer.id;
 
-  // useEffect(() => {
-  //   // DEVELOPMENT ONLY
-  //   if (players.len === 0) dispatch(initialiseGame());
-  // }, [players]);
-
   useEffect(() => {
-    if (activePlayer.getIsBust() || activePlayer.getIsStanding()) {
-      delay(
-        () => {
-          dispatch(cycleActivePlayer());
-        },
-        0,
-        waitingRef
-      );
-    } else if (activePlayer.id === dealer.id) {
-      dispatch(hit(activePlayer.id));
-      delay(
-        () => {
-          dispatch(cycleActivePlayer());
-        },
-        DELAY,
-        waitingRef
-      );
+    if (!gameIsFinished) {
+      if (activePlayer.getIsBust() || activePlayer.getIsStanding()) {
+        delay(
+          () => {
+            dispatch(cycleActivePlayer());
+          },
+          0,
+          waitingRef
+        );
+      } else if (activePlayer.id === dealer.id) {
+        dispatch(hit(activePlayer.id));
+        delay(
+          () => {
+            dispatch(cycleActivePlayer());
+          },
+          DELAY,
+          waitingRef
+        );
+      }
     }
-  }, [activePlayer.id, activePlayer.getIsBust(), activePlayer.getIsStanding()]);
+  }, [
+    activePlayer.id,
+    activePlayer.getIsBust(),
+    activePlayer.getIsStanding(),
+    gameIsFinished,
+  ]);
 
   useEffect(() => {
     if (allFinished) {
       waitingRef.current = false;
       delay(
         () => {
-          navigation.navigate("Welcome");
+          dispatch(calculateResults());
+          navigation.navigate("Winners");
         },
         DELAY,
         waitingRef

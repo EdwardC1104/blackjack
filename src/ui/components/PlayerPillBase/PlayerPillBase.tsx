@@ -12,13 +12,19 @@ interface Props {
   name: string;
   avatar: string;
   rightElement: React.ReactNode;
+  blurRightElement?: boolean;
 }
 
 interface AvatarImages {
   [key: string]: any;
 }
 
-export default function PlayerPillBase({ name, avatar, rightElement }: Props) {
+export default function PlayerPillBase({
+  name,
+  avatar,
+  rightElement,
+  blurRightElement = true,
+}: Props) {
   const avatarImages: AvatarImages = {
     ferret,
     elephant,
@@ -46,15 +52,17 @@ export default function PlayerPillBase({ name, avatar, rightElement }: Props) {
         />
       }
     >
-      <View
-        style={{
-          position: "absolute",
-          right: 20,
-          transform: [{ scale: 1.5 }],
-        }}
-      >
-        {rightElement}
-      </View>
+      {blurRightElement && (
+        <View
+          style={{
+            position: "absolute",
+            right: 20,
+            transform: [{ scale: 1.5 }],
+          }}
+        >
+          {rightElement}
+        </View>
+      )}
       <BlurView
         intensity={200}
         tint="dark"
