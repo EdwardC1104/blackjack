@@ -1,4 +1,4 @@
-import connect, { sql } from "@databases/expo";
+import connect, { sql, SQLQuery } from "@databases/expo";
 
 const db = connect("blackjack");
 

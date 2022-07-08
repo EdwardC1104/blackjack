@@ -9,7 +9,7 @@ export default class Hand {
 
   getValue() {
     const valueDictionary = {
-      ace: 1,
+      ace: 11,
       "2": 2,
       "3": 3,
       "4": 4,
@@ -27,8 +27,17 @@ export default class Hand {
     let totalValue = 0;
 
     for (const card of this.cards) {
-      totalValue += valueDictionary[card.rank];
+      if (card.rank !== "ace") totalValue += valueDictionary[card.rank];
     }
+    const numberOfAces = this.cards.reduce(
+      (count, card) => count + (card.rank === "ace" ? 1 : 0),
+      0
+    );
+
+    const aceValue = 11 + (numberOfAces - 1);
+
+    if (totalValue + aceValue > 21) totalValue += numberOfAces;
+    else totalValue += aceValue;
 
     return totalValue;
   }
